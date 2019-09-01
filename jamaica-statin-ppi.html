@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+	<title>Jamaica - Statin</title>
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+
+	<style type="text/css">
+
+
+	@import url('https://fonts.googleapis.com/css?family=Economica:400,700');
+
+
+	body {
+		background-color: teal;
+		padding: 0;
+		margin: 0;
+		/*font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;*/
+		font-family: 'Economica', sans-serif;
+		color: #333;
+		line-height: 1.3em;
+	}
+	div.content {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		height: 100vh;
+	}
+	div#title {
+		margin-top: auto;
+	}
+	h1 {
+		text-align: center;
+		/*text-decoration: underline;*/
+		/*margin-top: 7rem;*/
+	}
+	h2#subtitle {
+		text-align: center;
+		/*text-decoration: underline;*/
+		/*margin-top: 7rem;*/
+	}
+	p#description {
+		text-align: center;
+		font-family: 'Economica', sans-serif;
+		/*text-decoration: underline;*/
+		/*margin-top: 7rem;*/
+	}
+	div#option {
+		text-align: center;
+		width: 100%;
+		margin: 2rem 0 4rem 0;
+	}
+	input[type=button] {
+		font-size: 1.25rem;
+		background-color: transparent;
+		border: none;
+		outline: none;
+		/*font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;*/
+		font-family: 'Economica', sans-serif;
+		margin: 0 2rem;
+		color: #333;
+		font-weight: bold;
+		cursor: pointer;
+	}
+	input[type=button].active {
+		/*text-decoration: underline;*/
+		border-bottom: 2px solid #333;
+	}
+	div#line_chart {
+		/*position: absolute;
+		top: 0;
+		left: 0;*/
+		width: 100%;
+		/*flex-grow: 1;
+		display: flex;
+		justify-content: center;
+		align-items: center;*/
+		margin-bottom: auto;
+		position: relative;
+	}
+	.hide {
+		display: none;
+	}
+	svg {
+		width: 100vw;
+		height: 50vh;
+		max-width: 100%;
+		margin-bottom: 3rem;
+	}
+	svg.dim {
+		opacity: .25;
+	}
+	text {
+		/*font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;*/
+		font-family: 'Economica', sans-serif;
+		font-size: 1rem;
+		fill: #fff;
+	}
+	g.line {
+		opacity: .5;
+	}
+	g.line circle {
+		fill: rgb(33,33,33);
+		stroke: none;
+	}
+	g.line path {
+		stroke: rgb(33,33,33);
+		fill: none;
+	}
+	g.line.highlight,
+	g.line:hover {
+		opacity: 1;
+	}
+	g.line.highlight circle {
+		fill: goldenrod;
+	}
+	g.line.highlight path {
+		stroke: goldenrod;
+	}
+	g.line:hover circle {
+		fill: #fff;
+	}
+	g.line:hover path {
+		stroke: #fff;
+	}
+	g.axis {
+		opacity: .75;
+	}
+	g.axis path,
+	g.axis line {
+		stroke: #fff;
+	}
+	g.y.axis path {
+		display: none;
+	}
+	foreignObject > body {
+		padding: 0 20px;
+		background-color: transparent !important;
+		color: #fff;
+	}
+	g.highlight foreignObject > body {
+		color: goldenrod;
+	}
+	/* CSS FOR LOADER FROM https://loading.io/css/ */
+	.lds-grid {
+		/*display: inline-block;*/
+		position: absolute;
+		width: 64px;
+		height: 64px;
+		left: calc(50% - 32px);
+		top: calc(50% - 64px);
+	}
+	.lds-grid div {
+		position: absolute;
+		width: 13px;
+		height: 13px;
+		border-radius: 50%;
+		background: #fff;
+		animation: lds-grid 1.2s linear infinite;
+	}
+	.lds-grid div:nth-child(1) {
+		top: 6px;
+		left: 6px;
+		animation-delay: 0s;
+	}
+	.lds-grid div:nth-child(2) {
+		top: 6px;
+		left: 26px;
+		animation-delay: -0.4s;
+	}
+	.lds-grid div:nth-child(3) {
+		top: 6px;
+		left: 45px;
+		animation-delay: -0.8s;
+	}
+	.lds-grid div:nth-child(4) {
+		top: 26px;
+		left: 6px;
+		animation-delay: -0.4s;
+	}
+	.lds-grid div:nth-child(5) {
+		top: 26px;
+		left: 26px;
+		animation-delay: -0.8s;
+	}
+	.lds-grid div:nth-child(6) {
+		top: 26px;
+		left: 45px;
+		animation-delay: -1.2s;
+	}
+	.lds-grid div:nth-child(7) {
+		top: 45px;
+		left: 6px;
+		animation-delay: -0.8s;
+	}
+	.lds-grid div:nth-child(8) {
+		top: 45px;
+		left: 26px;
+		animation-delay: -1.2s;
+	}
+	.lds-grid div:nth-child(9) {
+		top: 45px;
+		left: 45px;
+		animation-delay: -1.6s;
+	}
+	@keyframes lds-grid {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
+	}
+
+	</style>
+</head>
+<body>
+	<div class='content'>
+		<div id='title'>
+			<h1>JAMAICA - STATIN</h1>
+			<h1><a href='https://statinja.gov.jm/PriceIndices.aspx'>Producer Price Index</a></h1>
+			<p id='description'>The Producer Price Index represents a family of indices that measures the average change in the selling prices received by <b>domestic producers of goods and services over time</b>.
+				These prices are usually the basic prices. The basic price excludes GCT and all other taxes and subsidies on products sold.
+				The prices are collected for a specified unit of measurement (litre, lb., kg.) of the good produced as output.</p>
+		</div>
+		<!-- <h3>All Jamaica Monthly Index</h3> -->
+		<!-- <h4>Time Frame: <span id="time_frame">ALL</span></h4> -->
+
+		<div id="option">
+			<input name="update_All_Button"
+				class='active'
+				type="button"
+				value="Since 2007"
+				onclick="d3.selectAll('input[type=button]').classed('active', false); d3.select(this).classed('active', true); draw('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1834&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2012&enddate=10/1/2016&transpose=yes')" />
+			<input
+				name="update_10Yr_Button"
+				type="button"
+				value="Last 10 years"
+				onclick="d3.selectAll('input[type=button]').classed('active', false); d3.select(this).classed('active', true); draw('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1834&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2012&enddate=10/1/2016&transpose=yes')" />
+			<input name="update_1Yr_Button"
+				type="button"
+				value="Last year"
+				onclick="d3.selectAll('input[type=button]').classed('active', false); d3.select(this).classed('active', true); draw('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1834&alttitle=&altextsrc=&a=exportcsv&startdate=10/1/2015&enddate=10/1/2016&transpose=yes');" />
+		</div>
+		<div id="line_chart">
+			<svg></svg>
+			<div class='lds-grid hide'><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+		<div>
+	</div>
+
+</body>
+
+
+
+<script>
+
+// const svg = d3.select("#line_chart").append("svg")
+	// .attr("width", width + margin.x + margin.x)
+	// .attr("height", height + margin.y + margin.y)
+
+const svg = d3.select('svg')
+const margin = { x: 200, y: 50 }
+const width = (svg.node().clientWidth || svg.node().offsetWidth) - margin.x * 2 // Use the window's width
+const height = (svg.node().clientHeight || svg.node().offsetHeight) - margin.y * 2 // Use the window's height
+
+const g = svg.append('g')
+	.attr('transform', `translate(${[margin.x, 0]})`);
+
+Array.prototype.flatten = function () { return [].concat.apply([], this) }
+d3.selection.prototype.moveToFront = function() {
+	return this.each(function(){
+		this.parentNode.appendChild(this)
+	})
+}
+
+function draw (_url) {
+	svg.classed('dim', true)
+	d3.select('div.lds-grid').classed('hide', false)
+
+	d3.csv(_url, function (res) {
+		keys = d3.keys(res)
+		const pt = d3.timeParse("%m/%d/%Y")
+		const output = keys.map(d => {
+			if (d !== 'Series title') return { date: pt(d), value: +res[d] }
+		}).filter(d => d)
+		return { title: res['Series title'], data: output }
+
+	}).then(function(data) {
+		svg.classed('dim', false)
+		d3.select('div.lds-grid').classed('hide', true)
+
+		const years = d3.timeYears(d3.min(data.map(d => d.data).flatten(), d => d.date), d3.max(data.map(d => d.data).flatten(), d => d.date)).length
+		var xScale = d3.scaleTime()
+			.domain(d3.extent(data.map(d => d.data).flatten(), d => d.date))
+			.range([0, width]);
+		var yScale = d3.scaleLinear()
+			.domain([0, d3.max(data.map(d => d.data).flatten(), d => d.value)])
+			.range([height, 0]);
+
+		var line = d3.line()
+			.x(function(d) { return xScale(d.date); }) // set the x values for the line generator
+			.y(function(d) { return yScale(d.value); }) // set the y values for the line generator
+			// .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+		let xAxis = g.selectAll('g.x.axis')
+			.data([0])
+		xAxis.exit().remove()
+		xAxis = xAxis.enter()
+			.append('g')
+			.attr('class', 'x axis')
+			.attr('transform', `translate(${[0, height]})`)
+		.merge(xAxis)
+		xAxis.transition()
+			.call(
+				d3.axisBottom(xScale)
+				.tickFormat(years > 1 ? d3.timeFormat('%Y') : d3.timeFormat('%m/%Y'))
+				// .tickFormat(d3.timeFormat("%Y-%m-%d"))
+				.tickPadding(20)
+				.tickSize(12.5)
+			)
+
+		let yAxis = g.selectAll('g.y.axis')
+			.data([0])
+		yAxis.exit().remove()
+		yAxis = yAxis.enter()
+			.append('g')
+			.attr('class', 'y axis')
+		.merge(yAxis)
+		yAxis.append('text')
+			.attr('transform', 'rotate(-90)')
+			.attr('y', 20)
+			.attr('dy', '0.71em')
+			.attr('text-anchor', 'end')
+			.text('Price ($ JMD)'); // Create an axis component with d3.axisLeft
+		yAxis.transition()
+			.call(
+				d3.axisLeft(yScale)
+				.tickPadding(20)
+				.tickSize(10)
+			)
+			// .call(g => g.select('path.domain').remove())
+
+
+		let gs = g.selectAll('g.line')
+			.data(data, d => d.title)
+		gs.exit().remove()
+		gs = gs.enter()
+			.append('g')
+			.attr('class', 'line')
+			.classed('highlight', d => d.title === 'ALL DIVISIONS - ALL ITEMS')
+		.merge(gs)
+			.on('mouseover', function () {
+				gs.selectAll('foreignObject.label').classed('hide', true)
+				d3.select(this).moveToFront()
+					.selectAll('foreignObject.label').classed('hide', false)
+			})
+			.on('mouseout', function () {
+				const sel = d3.select(this)
+				d3.select('g.line.highlight').moveToFront().selectAll('foreignObject.label').classed('hide', false)
+				if (!sel.classed('highlight')) sel.selectAll('foreignObject.label').classed('hide', true)
+			})
+		let paths = gs.selectAll('path')
+			.data(d => [d.data])
+		paths.exit().remove()
+		paths = paths.enter()
+			.append('path')
+			.attr('d', line)
+		.merge(paths)
+		paths.transition()
+			.attr('d', line)
+
+		let circles = gs.selectAll('circle')
+			.data(d => d.data)
+		circles.exit().remove()
+		circles = circles.enter()
+			.append('circle')
+			.attr('r', 3)
+			.attr('cx', d => xScale(d.date))
+			.attr('cy', d => yScale(d.value))
+		.merge(circles)
+		circles.transition()
+			.attr('cx', d => xScale(d.date))
+			.attr('cy', d => yScale(d.value))
+
+		let labels = gs.selectAll('foreignObject.label')
+			.data(d => [d])
+		labels.exit().remove()
+		labels = labels.enter()
+			.append('foreignObject')
+			.attr('class', 'label')
+		.classed('hide', d => d.title !== 'ALL DIVISIONS - ALL ITEMS')
+			.attr('x', d3.max(xScale.range()))
+			.attr('y', d => yScale(d.data[d.data.length - 1].value) - 12)
+			.attr('width', margin.x)
+			.attr('height', 100)
+		.merge(labels)
+		let body = labels.selectAll('body')
+			.data(d => [d.title])
+		body.exit().remove()
+		body = body.enter()
+			.append('xhtml:body')
+		.merge(body)
+			.html(d => d)
+
+		d3.select('g.line.highlight').moveToFront()
+	})
+}
+
+draw('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1834&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2012&enddate=10/1/2016&transpose=yes')
+ // ** Update data section (Called from the onclick)
+ // function update_1Yr_Data(value) {
+	// 	var svg_remove = d3.select("#line_chart");
+	// 	svg_remove.remove();
+	// 	var time_frame_update = d3.select("#time_frame")
+	// 							.html(value);
+	// 	var other_dataset = [];
+	//	// Get the data again
+	//	d3.csv('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1834&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2012&enddate=10/1/2016&transpose=yes', function(data) {
+	// 	 entries = d3.entries(data)
+	// 	 keys = d3.keys(data)
+	// 	 var other_dataset_x = [];
+	// 	 var other_dataset_x_array = [];
+	// 	 var other_dataset_y = [];
+	// 	 var other_dataset_xy = [];
+	// 	 var color = '#000000'; //black
+
+	// 	 for (var i = 0; i < entries.length; i++) {
+	// 		 if (entries[i]['key'] != 'Series title') {
+	// 		 other_dataset_y.push({"y": entries[i]['value']})
+	// 		 other_dataset_x.push({"x": formatTime(parseTime(entries[i]['key']))})
+	// 		 other_dataset_x_array.push(formatTime_x(parseTime(entries[i]['key'])))
+	// 		 other_dataset_xy.push({"x": (parseTime(entries[i]['key'])),"y": entries[i]['value']})
+	// 		 }
+	// 	 }
+	// 	 if (entries[0]['value'] == 'ALL DIVISIONS - ALL ITEMS'){
+	// 	 color = '#000000';
+	// 	 } else {
+	// 	 color = '#cccccc';
+	// 	 }
+	// 	 other_dataset.push({"name": entries[0]['value'],
+	// 						 x: other_dataset_x,x_array: other_dataset_x_array,
+	// 						 y:other_dataset_y,
+	// 						 rgb: color,
+	// 						 xy:other_dataset_xy})
+
+	//	}).then(function(data) {
+
+	// 	var svg = d3.select("body").append("svg")
+	// 		 .attr("id","line_chart")
+	// 		 .attr("width", width + margin.x + margin.x)
+	// 		 .attr("height", height + margin.y + margin.y)
+	// 	 .append("g")
+	// 		 .attr("transform", "translate(" + margin.x + "," + margin.y + ")");
+
+	//	var displaytime = d3.timeParse("%Y-%m-%d");
+	//	var xScale = d3.scaleTime()
+	// 		 .domain([displaytime(other_dataset[0].x_array[0]),displaytime(other_dataset[0].x_array[other_dataset[0].x_array.length - 1])]) // input
+	// 		 .range([0, width]); // output
+
+	// 	 var line = d3.line()
+	// 		 .x(function(d) { return xScale(d.x); }) // set the x values for the line generator
+	// 		 .y(function(d) { return yScale(d.y); }) // set the y values for the line generator
+	// 		 .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+
+	// 	 // 3. Call the x axis in a group tag
+	// 	 svg.append("g")
+	// 		.attr("class", "x axis")
+	// 		.attr("transform", "translate(0," + height + ")")
+	// 		.call(d3.axisBottom(xScale)
+	// 		.tickFormat(d3.timeFormat("%Y-%m-%d"))); // Create an axis component with d3.axisBottom
+
+	// 	 // 4. Call the y axis in a group tag
+	// 	 svg.append("g")
+	// 		.attr("class", "y axis")
+	// 		.call(d3.axisLeft(yScale))
+	// 		 .append("text")
+	// 			.attr("fill", "#000")
+	// 			.attr("transform", "rotate(-90)")
+	// 			.attr("y", 6)
+	// 			.attr("dy", "0.71em")
+	// 			.attr("text-anchor", "end")
+	// 			.text("Price ($ JMD)"); // Create an axis component with d3.axisLeft
+
+	// 	 for (var i = other_dataset.length - 1; -1 < i ; i--){
+	// 	 //var color_random = Math.random() * 360;
+	// 	 // 9. Append the path, bind the data, and call the line generator
+	// 	 svg.append("path")
+	// 		 //.datum(dataset) // 10. Binds data to the line
+	// 		 .datum(other_dataset[i].xy) // 10. Binds data to the line
+	// 		 //.data(other_dataset[0].xy) // 10. Binds data to the line
+	// 		 .attr("class", "line") // Assign a class for styling
+	// 		 //.style("stroke", "hsl(" + color_random + ",100%,50%)")
+	// 		 .style("stroke", other_dataset[i].rgb)
+	// 		 .attr("d", line); // 11. Calls the line generator
+	// 	 // 12. Appends a circle for each datapoint
+	// 	 svg.selectAll(".dot")
+	// 		 //.data(dataset)
+	// 		 .data(other_dataset[i].xy)
+	// 		 .enter().append("circle") // Uses the enter().append() method
+	// 		 //.attr("class", "dot") // Assign a class for styling
+	// 		 .attr("cx", function(d) { return xScale(d.x) })
+	// 		 .attr("cy", function(d) { return yScale(d.y) })
+	// 		 //.style("fill", "hsl(" + color_random + ",100%,50%)")
+	// 		 .style("fill", other_dataset[i].rgb)
+	// 		 .attr("r", 5);
+
+
+	// 	 }
+
+	// });
+
+
+
+	 //});
+ // }
+
+ // ** Update data section (Called from the onclick)
+ // function update_10Yr_Data(value) {
+	// 	var svg_remove = d3.select("#line_chart");
+	// 	svg_remove.remove();
+	// 	var time_frame_update = d3.select("#time_frame")
+	// 							.html(value);
+	// 	var other_dataset = [];
+	//	// Get the data again
+	//	d3.csv('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1834&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2012&enddate=10/1/2016&transpose=yes', function(data) {
+	// 	 console.log(data)
+	// 	 entries = d3.entries(data)
+	// 	 keys = d3.keys(data)
+	// 	 var other_dataset_x = [];
+	// 	 var other_dataset_x_array = [];
+	// 	 var other_dataset_y = [];
+	// 	 var other_dataset_xy = [];
+	// 	 var color = '#000000'; //black
+	// 	 //columns = d3.keys(d3.entries(data))
+	// 	 for (var i = 0; i < entries.length; i++) {
+	// 		 if (entries[i]['key'] != 'Series title') {
+	// 		 other_dataset_y.push({"y": entries[i]['value']})
+	// 		 other_dataset_x.push({"x": formatTime(parseTime(entries[i]['key']))})
+	// 		 other_dataset_x_array.push(formatTime_x(parseTime(entries[i]['key'])))
+	// 		 other_dataset_xy.push({"x": (parseTime(entries[i]['key'])),"y": entries[i]['value']})
+	// 		 }
+	// 	 }
+	// 	 if (entries[0]['value'] == 'ALL DIVISIONS - ALL ITEMS'){
+	// 	 color = '#000000';
+	// 	 } else {
+	// 	 color = '#cccccc';
+	// 	 }
+	// 	 other_dataset.push({"name": entries[0]['value'],
+	// 						 x: other_dataset_x,x_array: other_dataset_x_array,
+	// 						 y:other_dataset_y,
+	// 						 rgb: color,
+	// 						 xy:other_dataset_xy})
+
+	//	}).then(function(data) {
+
+	// 	 // 1. Add the SVG to the page and employ #2
+	// 	var svg = d3.select("body").append("svg")
+	// 		 .attr("id","line_chart")
+	// 		 .attr("width", width + margin.x + margin.x)
+	// 		 .attr("height", height + margin.y + margin.y)
+	// 	 .append("g")
+	// 		 .attr("transform", "translate(" + margin.x + "," + margin.y + ")");
+
+	//	var displaytime = d3.timeParse("%Y-%m-%d");
+	//	var xScale = d3.scaleTime()
+	// 		 .domain([displaytime(other_dataset[0].x_array[0]),displaytime(other_dataset[0].x_array[other_dataset[0].x_array.length - 1])]) // input
+	// 		 //.domain(['2007-01-01','2007-02-01','2007-03-01','2007-04-01']) // input
+	// 		 .range([0, width]); // output
+	// 	 //xScale.ticks(d3.timeMonth.every(1));
+
+	// 	 // 7. d3's line generator
+	// 	 var line = d3.line()
+	// 		 //.x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+	// 		 .x(function(d) { return xScale(d.x); }) // set the x values for the line generator
+	// 		 .y(function(d) { return yScale(d.y); }) // set the y values for the line generator
+	// 		 .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+
+	// 	 // 3. Call the x axis in a group tag
+	// 	 svg.append("g")
+	// 		 .attr("class", "x axis")
+	// 		 .attr("transform", "translate(0," + height + ")")
+	// 		 .call(d3.axisBottom(xScale)
+	// 				 .tickFormat(d3.timeFormat("%Y-%m-%d"))); // Create an axis component with d3.axisBottom
+
+	// 	 // 4. Call the y axis in a group tag
+	// 	 svg.append("g")
+	// 		 .attr("class", "y axis")
+	// 		 .call(d3.axisLeft(yScale))
+	// 		 .append("text")
+	// 			.attr("fill", "#000")
+	// 			.attr("transform", "rotate(-90)")
+	// 			.attr("y", 6)
+	// 			.attr("dy", "0.71em")
+	// 			.attr("text-anchor", "end")
+	// 			.text("Price ($ JMD)"); // Create an axis component with d3.axisLeft
+
+	// 	 for (var i = other_dataset.length - 1; -1 < i ; i--){
+	// 	 //var color_random = Math.random() * 360;
+	// 	 // 9. Append the path, bind the data, and call the line generator
+	// 	 svg.append("path")
+	// 		 //.datum(dataset) // 10. Binds data to the line
+	// 		 .datum(other_dataset[i].xy) // 10. Binds data to the line
+	// 		 //.data(other_dataset[0].xy) // 10. Binds data to the line
+	// 		 .attr("class", "line") // Assign a class for styling
+	// 		 //.style("stroke", "hsl(" + color_random + ",100%,50%)")
+	// 		 .style("stroke", other_dataset[i].rgb)
+	// 		 .attr("d", line); // 11. Calls the line generator
+	// 	 // 12. Appends a circle for each datapoint
+	// 	 svg.selectAll(".dot")
+	// 		 //.data(dataset)
+	// 		 .data(other_dataset[i].xy)
+	// 		 .enter().append("circle") // Uses the enter().append() method
+	// 		 //.attr("class", "dot") // Assign a class for styling
+	// 		 .attr("cx", function(d) { return xScale(d.x) })
+	// 		 .attr("cy", function(d) { return yScale(d.y) })
+	// 		 //.style("fill", "hsl(" + color_random + ",100%,50%)")
+	// 		 .style("fill", other_dataset[i].rgb)
+	// 		 .attr("r", 5);
+
+
+	// 	 }
+
+	// });
+
+
+
+	//	//});
+ // }
+
+ // ** Update data section (Called from the onclick)
+ // function update_All_Data(value) {
+	// 	var svg_remove = d3.select("#line_chart");
+	// 	svg_remove.remove();
+	// 	var time_frame_update = d3.select("#time_frame")
+	// 							.html(value);
+	// 	var other_dataset = [];
+	//	// Get the data again
+	//	d3.csv('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1834&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2012&enddate=10/1/2016&transpose=yes', function(data) {
+	// 	 entries = d3.entries(data)
+	// 	 keys = d3.keys(data)
+	// 	 var other_dataset_x = [];
+	// 	 var other_dataset_x_array = [];
+	// 	 var other_dataset_y = [];
+	// 	 var other_dataset_xy = [];
+	// 	 var color = '#000000'; //black
+	// 	 //columns = d3.keys(d3.entries(data))
+	// 	 for (var i = 0; i < entries.length; i++) {
+	// 		 if (entries[i]['key'] != 'Series title') {
+	// 		 other_dataset_y.push({"y": entries[i]['value']})
+	// 		 other_dataset_x.push({"x": formatTime(parseTime(entries[i]['key']))})
+	// 		 other_dataset_x_array.push(formatTime_x(parseTime(entries[i]['key'])))
+	// 		 other_dataset_xy.push({"x": (parseTime(entries[i]['key'])),"y": entries[i]['value']})
+	// 		 }
+	// 	 }
+	// 	 if (entries[0]['value'] == 'ALL DIVISIONS - ALL ITEMS'){
+	// 	 color = '#000000';
+	// 	 } else {
+	// 	 color = '#cccccc';
+	// 	 }
+	// 	 other_dataset.push({"name": entries[0]['value'],
+	// 						 x: other_dataset_x,x_array: other_dataset_x_array,
+	// 						 y:other_dataset_y,
+	// 						 rgb: color,
+	// 						 xy:other_dataset_xy})
+
+	//	}).then(function(data) {
+
+	// 	 // 1. Add the SVG to the page and employ #2
+	// 	var svg = d3.select("body").append("svg")
+	// 		 .attr("id","line_chart")
+	// 		 .attr("width", width + margin.x + margin.x)
+	// 		 .attr("height", height + margin.y + margin.y)
+	// 	 .append("g")
+	// 		 .attr("transform", "translate(" + margin.x + "," + margin.y + ")");
+
+	//	var displaytime = d3.timeParse("%Y-%m-%d");
+	//	var xScale = d3.scaleTime()
+	// 		 .domain([displaytime(other_dataset[0].x_array[0]),displaytime(other_dataset[0].x_array[other_dataset[0].x_array.length - 1])]) // input
+	// 		 //.domain(['2007-01-01','2007-02-01','2007-03-01','2007-04-01']) // input
+	// 		 .range([0, width]); // output
+	// 	 //xScale.ticks(d3.timeMonth.every(1));
+
+	// 	 // 7. d3's line generator
+	// 	 var line = d3.line()
+	// 		 //.x(function(d, i) { return xScale(i); }) // set the x values for the line generator
+	// 		 .x(function(d) { return xScale(d.x); }) // set the x values for the line generator
+	// 		 .y(function(d) { return yScale(d.y); }) // set the y values for the line generator
+	// 		 .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+
+	// 	 // 3. Call the x axis in a group tag
+	// 	 svg.append("g")
+	// 		 .attr("class", "x axis")
+	// 		 .attr("transform", "translate(0," + height + ")")
+	// 		 .call(d3.axisBottom(xScale)
+	// 				 .tickFormat(d3.timeFormat("%Y-%m-%d"))); // Create an axis component with d3.axisBottom
+
+	// 	 // 4. Call the y axis in a group tag
+	// 	 svg.append("g")
+	// 		 .attr("class", "y axis")
+	// 		 .call(d3.axisLeft(yScale))
+	// 		 .append("text")
+	// 			.attr("fill", "#000")
+	// 			.attr("transform", "rotate(-90)")
+	// 			.attr("y", 6)
+	// 			.attr("dy", "0.71em")
+	// 			.attr("text-anchor", "end")
+	// 			.text("Price ($ JMD)"); // Create an axis component with d3.axisLeft
+
+	// 	 for (var i = other_dataset.length - 1; -1 < i ; i--){
+
+	// 		 svg.append("path")
+	// 			 //.datum(dataset) // 10. Binds data to the line
+	// 			 .datum(other_dataset[i].xy) // 10. Binds data to the line
+	// 			 //.data(other_dataset[0].xy) // 10. Binds data to the line
+	// 			 .attr("class", "line") // Assign a class for styling
+	// 			 //.style("stroke", "hsl(" + color_random + ",100%,50%)")
+	// 			 .style("stroke", other_dataset[i].rgb)
+	// 			 .attr("d", line); // 11. Calls the line generator
+	// 		 // 12. Appends a circle for each datapoint
+	// 		 svg.selectAll(".dot")
+	// 			 //.data(dataset)
+	// 			 .data(other_dataset[i].xy)
+	// 			 .enter().append("circle") // Uses the enter().append() method
+	// 			 //.attr("class", "dot") // Assign a class for styling
+	// 			 .attr("cx", function(d) { return xScale(d.x) })
+	// 			 .attr("cy", function(d) { return yScale(d.y) })
+	// 			 //.style("fill", "hsl(" + color_random + ",100%,50%)")
+	// 			 .style("fill", other_dataset[i].rgb)
+	// 			 .attr("r", 5);
+
+
+	// 	 }
+
+	// });
+
+
+
+	 //});
+ // }
+
+</script>
