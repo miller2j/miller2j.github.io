@@ -361,6 +361,7 @@ function draw (_url) {
 			.attr('class', 'line')
 			//.classed('highlight', d => d.title === 'ALL DIVISIONS - ALL ITEMS')
 			.classed('highlight', d => d.title === 'Other Food Products n.e.c.')
+			//.classed('highlight', d => d.title.includes('Other'))
 		.merge(gs)
 			.on('mouseover', function () {
 				gs.selectAll('foreignObject.label').classed('hide', true)
@@ -403,6 +404,7 @@ function draw (_url) {
 			.attr('class', 'label')
 		//.classed('hide', d => d.title !== 'ALL DIVISIONS - ALL ITEMS')
 		.classed('hide', d => d.title !== 'Other Food Products n.e.c.')
+		//.classed('hide', d => !(d.title.includes('Other')))
 			.attr('x', d3.max(xScale.range()))
 			.attr('y', d => yScale(d.data[d.data.length - 1].value) - 12)
 			.attr('width', margin.x)
