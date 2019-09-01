@@ -118,7 +118,7 @@
 	g.axis path,
 	g.axis line {
 		stroke: #fff;
-	} 
+	}
 	g.y.axis path {
 		display: none;
 	}
@@ -213,19 +213,19 @@
 
 		<div id="option">
 			<input name="update_All_Button"
-				class='active' 
+				class='active'
 				type="button"
 				value="Since 2007"
-				onclick="d3.selectAll('input[type=button]').classed('active', false); d3.select(this).classed('active', true); draw('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2007&enddate=12/1/2018&transpose=yes')" />
-			<input 
+				onclick="d3.selectAll('input[type=button]').classed('active', false); d3.select(this).classed('active', true); draw('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2007&enddate=12/1/2018&transpose=yes')" />
+			<input
 				name="update_10Yr_Button"
 				type="button"
 				value="Last 10 years"
-				onclick="d3.selectAll('input[type=button]').classed('active', false); d3.select(this).classed('active', true); draw('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=12/1/2008&enddate=12/1/2018&transpose=yes')" />
+				onclick="d3.selectAll('input[type=button]').classed('active', false); d3.select(this).classed('active', true); draw('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=12/1/2008&enddate=12/1/2018&transpose=yes')" />
 			<input name="update_1Yr_Button"
 				type="button"
 				value="Last year"
-				onclick="d3.selectAll('input[type=button]').classed('active', false); d3.select(this).classed('active', true); draw('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=12/1/2017&enddate=12/1/2018&transpose=yes');" />
+				onclick="d3.selectAll('input[type=button]').classed('active', false); d3.select(this).classed('active', true); draw('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=12/1/2017&enddate=12/1/2018&transpose=yes');" />
 		</div>
 		<div id="line_chart">
 			<svg></svg>
@@ -273,10 +273,10 @@ function draw (_url) {
 	}).then(function(data) {
 		svg.classed('dim', false)
 		d3.select('div.lds-grid').classed('hide', true)
-		
+
 		const years = d3.timeYears(d3.min(data.map(d => d.data).flatten(), d => d.date), d3.max(data.map(d => d.data).flatten(), d => d.date)).length
 		var xScale = d3.scaleTime()
-			.domain(d3.extent(data.map(d => d.data).flatten(), d => d.date)) 
+			.domain(d3.extent(data.map(d => d.data).flatten(), d => d.date))
 			.range([0, width]);
 		var yScale = d3.scaleLinear()
 			.domain([0, d3.max(data.map(d => d.data).flatten(), d => d.value)])
@@ -334,12 +334,12 @@ function draw (_url) {
 			.attr('class', 'line')
 			.classed('highlight', d => d.title === 'ALL DIVISIONS - ALL ITEMS')
 		.merge(gs)
-			.on('mouseover', function () { 
+			.on('mouseover', function () {
 				gs.selectAll('foreignObject.label').classed('hide', true)
-				d3.select(this).moveToFront() 
+				d3.select(this).moveToFront()
 					.selectAll('foreignObject.label').classed('hide', false)
 			})
-			.on('mouseout', function () { 
+			.on('mouseout', function () {
 				const sel = d3.select(this)
 				d3.select('g.line.highlight').moveToFront().selectAll('foreignObject.label').classed('hide', false)
 				if (!sel.classed('highlight')) sel.selectAll('foreignObject.label').classed('hide', true)
@@ -353,7 +353,7 @@ function draw (_url) {
 		.merge(paths)
 		paths.transition()
 			.attr('d', line)
-		
+
 		let circles = gs.selectAll('circle')
 			.data(d => d.data)
 		circles.exit().remove()
@@ -366,7 +366,7 @@ function draw (_url) {
 		circles.transition()
 			.attr('cx', d => xScale(d.date))
 			.attr('cy', d => yScale(d.value))
-		
+
 		let labels = gs.selectAll('foreignObject.label')
 			.data(d => [d])
 		labels.exit().remove()
@@ -386,12 +386,12 @@ function draw (_url) {
 			.append('xhtml:body')
 		.merge(body)
 			.html(d => d)
-		
+
 		d3.select('g.line.highlight').moveToFront()
 	})
 }
 
-draw('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2007&enddate=12/1/2018&transpose=yes')
+draw('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2007&enddate=12/1/2018&transpose=yes')
  // ** Update data section (Called from the onclick)
  // function update_1Yr_Data(value) {
 	// 	var svg_remove = d3.select("#line_chart");
@@ -400,7 +400,7 @@ draw('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1
 	// 							.html(value);
 	// 	var other_dataset = [];
 	//	// Get the data again
-	//	d3.csv('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=12/1/2017&enddate=12/1/2018&transpose=yes', function(data) {
+	//	d3.csv('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=12/1/2017&enddate=12/1/2018&transpose=yes', function(data) {
 	// 	 entries = d3.entries(data)
 	// 	 keys = d3.keys(data)
 	// 	 var other_dataset_x = [];
@@ -508,7 +508,7 @@ draw('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1
 	// 							.html(value);
 	// 	var other_dataset = [];
 	//	// Get the data again
-	//	d3.csv('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=12/1/2008&enddate=12/1/2018&transpose=yes', function(data) {
+	//	d3.csv('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=12/1/2008&enddate=12/1/2018&transpose=yes', function(data) {
 	// 	 console.log(data)
 	// 	 entries = d3.entries(data)
 	// 	 keys = d3.keys(data)
@@ -622,7 +622,7 @@ draw('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1
 	// 							.html(value);
 	// 	var other_dataset = [];
 	//	// Get the data again
-	//	d3.csv('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2007&enddate=12/1/2018&transpose=yes', function(data) {
+	//	d3.csv('https://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1833&alttitle=&altextsrc=&a=exportcsv&startdate=1/1/2007&enddate=12/1/2018&transpose=yes', function(data) {
 	// 	 entries = d3.entries(data)
 	// 	 keys = d3.keys(data)
 	// 	 var other_dataset_x = [];
@@ -725,5 +725,5 @@ draw('http://www.datazoa.com/publish/export.asp?hash=9EE5D46C72&glname=&dzuuid=1
 
 	 //});
  // }
- 
+
 </script>
