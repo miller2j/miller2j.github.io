@@ -2,7 +2,7 @@
 layout: default
 ---
 
-# Projects
+# My Projects
 
 Below is a list of projects from various datasets explored and developed for presentation:
 
