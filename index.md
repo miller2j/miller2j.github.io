@@ -6,6 +6,17 @@ layout: default
 
 Below is a list of projects from various datasets explored and developed for presentation:
 
+## Jamaica - Open Data
+
+```_May 2020_
+```
+
+The Jamaica's Open Data Catalog was designed to provide access to timely and relevant data from various ministries and agencies. The portal was built using DKAN, a Drupal-based open data tool with a full suite of cataloging, publishing and visualization features that allows governments, nonprofits and universities to easily publish data to the public.
+
+
+Below are a few visualizations of some datasets:
+1.  [Jamaica Crashes and Road Accident Fatalities](./Jamaica/Open_Data/index.html?option=crashes_and_road_accident_fatalities).
+
 ## Jamaica - Statin
 
 ```_September 2019_

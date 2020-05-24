@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Jamaica Open Data - Visualization</title>
+
+  <style>
+  .jm-boundary {
+    fill: none;
+    stroke: #000;
+  }
+  .parish-boundary {
+    fill: none;
+    stroke: #000;
+    stroke-dasharray: 2,2;
+    stroke-linejoin: round;
+  }
+  .parish {
+    fill: none;
+
+  }
+  div.tooltip {
+        color: #222;
+        background-color: #fff;
+        padding: .5em;
+        text-shadow: #f5f5f5 0 1px 0;
+        border-radius: 2px;
+        opacity: 0.9;
+        position: absolute;
+    }
+    .hidden {
+        display: none;
+    }
+  /* CSS goes here. */
+
+  </style>
+  <!-- Rich Preview Details -->
+	<meta name="description" content="Using Public Data from Jamaica Open Data to highlight visualizations" />
+	<meta property="og:title" content="Jamaica - Open Data: Crashes and Road Fatalities" />
+	<meta property="og:description" content="Using Public Data from Jamaica Open Data to highlight visualizations" />
+	<meta property="og:url" content="https://miller2j.github.io/jamaica-statin-cpi.html" />
+	<meta property="og:image" content="https://miller2j.github.io/jamaica-statin-cpi.png" />
+	<link rel="shortcut icon" href="https://miller2j.github.io/favicon.ico" type="image/x-icon" />
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://d3js.org/topojson.v1.min.js"></script>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-146918527-1"></script>
+	<script>
+  	window.dataLayer = window.dataLayer || [];
+  	function gtag(){dataLayer.push(arguments);}
+  	gtag('js', new Date());
+
+  	gtag('config', 'UA-146918527-1');
+	</script>
+
+</head>
+<body onload="SelectDataset()">
+  <label for="datasets">Select a Dataset:</label>
+  <select name="datasets" id="datasets" onchange="SelectDataset()">
+    <option id="crashes_and_road_accident_fatalities" value="crashes_and_road_accident_fatalities">Crashes and Road Accident Fatalities</option>
+    <option id="other" value="other">Other</option>
+  </select>
+  <div> Hover over map for more details </div>
+  <br/>
+  <div id='map' name='map'></div> <!-- width: 730, height: 490 -->
+  <div id='bar' name='bar'></div>
+  <script>
+    var width = 960, //960
+      height = 500; //1120
+    var bar_width = 960, //960
+      bar_height = 700; //1120
+    var margin = {top: 20, right: 20, bottom: 70, left: 40};
+    var tmp = [];
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    if (urlParams.has('option')) {
+      console.log('not empty');
+      document.getElementById("datasets").value = urlParams.get('option')
+    } else {
+      console.log('empty');
+    }
+    //var svg = d3.select("body").append("svg")
+    var svg = d3.select("#map").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+    var svg_bar = d3.select("#bar").append("svg")
+      .attr("width", bar_width - margin.left - margin.right)
+      .attr("height", bar_height - margin.top - margin.bottom)
+      .append("g")
+      .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+    var	parseDate = d3.time.format("%Y").parse;
+    var x = d3.scale.ordinal().rangeRoundBands([0, (bar_width - margin.left - margin.right)], .15);
+    var y = d3.scale.linear().range([(height - margin.top - margin.bottom), 0]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+        //.tickFormat(d3.time.format("%Y"));
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10);
+    //var tooltip = d3.select('body').append('div')
+    var tooltip = d3.select('#map').append('div')
+        .attr('class', 'hidden tooltip');
+    var g = svg.append("path");
+    var list_of_parishes = [];
+      /* JavaScript goes here. */
+    //d3.json("jm.json", function(error, jm) {
+    d3.json("jamaica.json", function(error, jm) {
+      if (error) return console.error(error);
+
+      //var subunits = topojson.feature(jm, jm.objects.jam_subunits);
+      var subunits = topojson.feature(jm, jm.objects.adm0);
+      var projection = d3.geo.mercator()
+                          .scale(17500)  //17500
+                          //.center([width / 2 , height / 21.5]);
+                          .translate([width * 25.15 , height * 11.55]); // w: * 25.05, h : * 5.35
+      var path = d3.geo.path()
+        .projection(projection);
+
+      svg.append("path")
+        .datum(topojson.mesh(jm, jm.objects.adm0, function(a, b) { return a === b && a.id === "JM"; }))
+        .attr("d", path)
+        .attr("class", "jm-boundary");
+      //console.log(topojson.feature(jm, jm.objects.adm1).features);
+      topojson.feature(jm, jm.objects.adm1).features.forEach( x => list_of_parishes.push(x.properties.name.split(' ')[x.properties.name.split(' ').length - 1]))
+      //console.log(list_of_parishes)
+      var parishes = svg.selectAll('.parish')
+                .data(topojson.feature(jm, jm.objects.adm1).features).enter();
+      parishes.append('path')
+                .attr('d', path)
+                //.attr("class", "parish")
+                .on('mouseover', function(d, i) {
+                  var currentState = this;
+                  console.log(this);
+                  this.style.fill = "gray";
+                  //this.attr("fill", "gray");
+                  var mouse = d3.mouse(svg.node()).map(function(d) {
+                                  return parseInt(d);
+                              });
+                  tooltip.classed('hidden', false)
+                        .attr('style', 'left:' + (mouse[0] + 15) +
+                              'px; top:' + (mouse[1] - 35) + 'px')
+                        .html(d.properties.name);
+                            //.html(d.properties.name);
+                  call_parish(d.properties.name);
+                  console.log(d.properties.name);
+                })
+                .on('onclick', function(d, i) {
+                    //call_parish(d.properties.name);
+                    console.log(d.properties.name);
+                })
+                .on('mouseout', function(d, i) {
+                  this.style.fill = "#000";
+                  tooltip.classed('hidden', true);
+                });
+
+    svg.append("path")
+      //.datum(topojson.mesh(jm, jm.objects.adm1, function(a, b) { return a !== b }))
+      .datum(topojson.mesh(jm, jm.objects.adm1, function(a, b) {return a !== b; }))
+      .attr("d", path)
+      .attr("class", "parish-boundary");
+      /*.on('mouseover', function(d, i) {
+        var currentState = this;
+        console.log(this);
+        console.log(d)
+        var mouse = d3.mouse(svg.node()).map(function(d) {
+                        return parseInt(d);
+                    });
+        tooltip.classed('hidden', false)
+              .attr('style', 'left:' + (mouse[0] + 15) +
+                    'px; top:' + (mouse[1] - 35) + 'px')
+                  .html('Parish');
+                  //.html(d.properties.name);
+      })
+      .on('mouseout', function(d, i) {
+        tooltip.classed('hidden', true);
+      });*/
+
+
+    });
+
+    function SelectDataset() {
+      var x = document.getElementById("datasets").value;
+      switch (x) {
+        case 'crashes_and_road_accident_fatalities':
+          //get_csv();
+          //var tmp = [];
+          tmp = [];
+          d3.csv("https://data.gov.jm/sites/default/files/Fatalities%20by%20Parish.csv", function(d) {
+            if (d.Division.includes('Kingston')){
+              d.Division = 'Kingston';
+            } else {
+              if (d.Division.split(' ').length > 2) {
+                d.Division =   d.Division.split(' ')[d.Division.split(' ').length - 2];
+              } else {
+                d.Division =   d.Division.split(' ')[d.Division.split(' ').length - 1];
+              }
+            }
+            return {
+              //year: new Date(+d.Year, 0, 1), // convert "Year" column to Date
+              year: parseInt(d.Year), // convert "Year" column to Date
+              division: d.Division,
+              //division: d.Division,
+              //fatal_accidents: d.Fatal_Accidents,
+              fatalities: +d.Fatalities // convert "Length" column to number
+            };
+          }, function(error, rows) {
+            console.log(rows);
+            rows.forEach( r => {
+
+              ///if (r.year === 2007){
+                list_of_parishes.forEach( x => {
+                  if(tmp.some(t => t.name === x)){
+                      //console.log("Object found inside the array.");
+                      if (r.division.includes(x)){
+                        var val = {};
+                        //var val = {name: x, [year: r.Year, count: +r.Fatalities]};
+                        val['name'] = x;
+                        var values = [];
+                        var value = {};
+                        value['year'] = r.year;
+                        value['count'] = r.fatalities;
+                        values.push(value);
+                        val['values'] = values;
+                        //tmp.push(val);
+                        const isParish = (element) => element['name'] === x;
+                        const isYear = (element) => element['year'] === r.year;
+                        var extra = tmp.findIndex(isParish);
+                        //console.log(extra);
+                        //console.log(tmp[extra]);
+                        if (tmp[extra].values.some(t => t.year === r.year)){
+                          //console.log("Value already in array");
+                          var extra_year = tmp[extra].values.findIndex(isYear);
+                          tmp[extra].values[extra_year].count =  tmp[extra].values[extra_year].count + r.fatalities;
+                        } else {
+                          //console.log("Value NOT in the array.");
+                          tmp.map(y => {
+                            if (y.name === x) {
+                              y.values.push(value)
+                              //y.values.push([r.year,r.fatalities])
+                            }
+                          })
+                        }
+
+                      //tmp[x].push(values);
+                      }
+
+                  } else{
+                      //console.log("Object not found.");
+                      if (r.division.includes(x)){
+                        var val = {};
+                        //var val = {name: x, [year: r.Year, count: +r.Fatalities]};
+                        val['name'] = x;
+                        var values = [];
+                        var value = {};
+                        value['year'] = r.year;
+                        value['count'] = r.fatalities;
+                        values.push(value);
+                        val['values'] = values;
+                        tmp.push(val);
+
+                        }
+                  }
+
+                }
+                );
+
+            }
+            );
+            //const reducer = (accumulator, currentValue) => ();
+            console.log(tmp);
+            tmp.forEach( x => {
+              const usersByLikes = x.values.map(item => {
+                  const container = {};
+
+                  container['name'] = x.name;
+                  container.values = [item.year, item.count];
+
+                  return container;
+              })
+              //console.log(usersByLikes);
+            })
+            console.log(tmp);
+
+
+            ////////////
+
+
+
+            //x.domain(data.map(function(d) { return d.date; }));
+
+            ////////////
+          });
+
+          break;
+        case 'other':
+          console.log('This select the other select option');
+          // expected output: "Mangoes and papayas are $2.79 a pound."
+          break;
+        default:
+          console.log(`Sorry, this options is not available:  ${x}.`);
+      }
+
+
+    }
+    function call_parish(parish){
+        const isParish = (element) => parish.includes(element['name']);
+        var extra = tmp.findIndex(isParish);
+
+        x.domain(tmp[extra].values.map(function(d) { return d.year; }));
+        y.domain([0, d3.max(tmp[extra].values, function(d) { return d.count; })]);
+
+        svg_bar.html('');
+        svg_bar.append("g")
+          .attr("class", "x axis")
+          //.attr("transform", "translate(0," + height + ")")
+          .attr("transform", "translate(0," + (height - margin.top - margin.bottom) + ")")
+          .call(xAxis)
+        .selectAll("text")
+          .style("text-anchor", "end")
+          .attr("dx", "-.8em")
+          .attr("dy", "-.55em")
+          .attr("transform", "rotate(-90)" );
+
+        svg_bar.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+        .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Value ");
+        var data = tmp[extra].values;
+        svg_bar.selectAll("bar")
+          .data(data)
+        .enter().append("rect")
+          //.style("fill", "steelblue")
+          .style("fill", "green")
+          //.attr("x", function(d) { return x(d.date); })
+          .attr("x", function(d) { return x(d.year); })
+          .attr("width", x.rangeBand())
+          //.attr("y", function(d) { return y(d.value); })
+          .attr("y", function(d) { return y(d.count); })
+          .attr("height", function(d) { return (height - margin.top - margin.bottom) - y(d.count); });
+          //.attr("height", function(d) { return height - y(d.value); });
+
+        svg_bar.append("g")
+          .append("text")
+          .text(document.getElementById(document.getElementById("datasets").value).text +" - "+parish)
+          .attr("class", "title")
+          .attr("x", bar_width / 3)
+          .attr("y", 0);
+      }
+  </script>
+</body>
+</html>
