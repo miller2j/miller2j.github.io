@@ -197,6 +197,10 @@
           //get_csv();
           //var tmp = [];
           tmp = [];
+          d3.csv("https://data.gov.jm/sites/default/files/Fatalities%20by%20Parish.csv").header("Access-Control-Allow-Origin", "*").get(function(error, rows) {
+            console.log('success');
+          });
+
           d3.csv("data/Fatalities%20by%20Parish.csv", function(d) {
           //d3.csv("https://miller2j.github.io/Jamaica/Open_Data/data/Fatalities%20by%20Parish.csv", function(d) {
           //d3.csv("https://data.gov.jm/sites/default/files/Fatalities%20by%20Parish.csv", function(d) {
