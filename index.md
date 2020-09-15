@@ -6,6 +6,17 @@ layout: default
 
 Below is a list of projects from various datasets explored and developed for presentation:
 
+## UN Global Pulse - Qatalog
+
+August 2020
+
+Qatalog is an internal tool being developed to allow analysis from various data sources using machine learning such as topic modeling, term association, vector model training along with visualization graphs and maps to highlight each use case.
+
+
+Below are a few links on the product:
+1.  [UNGP - Qatalog microsite page](https://www.unglobalpulse.org/microsite/qatalog/)
+2.  [Youtube - Qatalog Product Showcase Video](https://youtu.be/DY2fB_fusEM)
+
 ## Jamaica - Open Data
 
 May 2020

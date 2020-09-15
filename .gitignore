@@ -1,0 +1,7 @@
+# exclude files not to be uploaded
+.DS_Store
+index_bkp.md
+index_copy.md
+Jamaica/.DS_Store
+Jamaica/STATIN/.DS_Store
+Jamaica/Open_Data/.DS_Store
