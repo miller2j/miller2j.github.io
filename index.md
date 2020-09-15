@@ -10,7 +10,7 @@ Below is a list of projects from various datasets explored and developed for pre
 
 August 2020
 
-Qatalog is an internal tool developed by [(**UN Global Pulse**)](https://www.unglobalpulse.org/) to allow analysis from various data sources using machine learning such as topic modeling, term association, vector model training along with visualization graphs and maps to highlight each use case.
+Qatalog is an internal tool developed by [**UN Global Pulse**](https://www.unglobalpulse.org/) to allow analysis from various data sources using machine learning such as topic modeling, term association, vector model training along with visualization graphs and maps to highlight each use case.
 
 
 Below are a few links on the product:
